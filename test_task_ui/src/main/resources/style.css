@@ -1,0 +1,22 @@
+#notSelected{
+    -fx-text-fill: -fx-text-inner-color;
+    -fx-font-weight: normal;
+}
+#select{
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+.check-box:selected > .box,
+.check-box:selected > .box .mark{
+    -fx-text-fill: #000000;
+    -fx-border-color: #000000;
+}
+#vague{
+    -fx-text-fill: #808080;
+    -fx-font-weight: bold;
+}
+.check-box:indeterminate > .box,
+.check-box:indeterminate > .box .mark{
+    -fx-border-color: #808080;
+    -fx-text-fill: #808080;
+}
