@@ -3,11 +3,11 @@ package controller;
 import data.RowData;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -25,6 +25,8 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
+    @FXML
+    private Button apply;
     @FXML
     private TextField textField;
     @FXML
@@ -62,14 +64,13 @@ public class Controller implements Initializable {
         return selectedData;
     }
 
-    @FXML
-    private void apply(ActionEvent actionEvent) {
-        myComboBox.getSelected();
+    public TableView<RowData> getTable_1() {
+        return table_1;
     }
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        apply.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> myComboBox.getSelected());
         myComboBox = new MyComboBox(this);
         table_1.setItems(dataObservableList);
         table_2.setItems(selectedData);

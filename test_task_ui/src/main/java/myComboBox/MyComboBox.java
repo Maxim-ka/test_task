@@ -5,33 +5,44 @@ import data.RowData;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Popup;
 import javafx.stage.PopupWindow;
+import javafx.stage.WindowEvent;
 import javafx.util.StringConverter;
 
 public class MyComboBox {
 
+    private static final int HEIGHT_ITEM = 25;
+    private static final String ALL = "All";
+    private static final String COLON = ": ";
+    private static final String COMMA = ", ";
+    private static final String THREE_DOTS = "... ";
+    private static final String FILE_TYPES = "Типы файлов";
     private TextField textField;
     private final Popup popup;
     private final CheckBoxTreeItem<RowData> root;
-    private final TreeView<RowData> treeView;
+    private final StringBuilder stringBuilder;
     private ObservableList<RowData> observableList;
     private ObservableList<RowData> selectedData;
     private boolean isShowing;
 
     public MyComboBox(Controller controller) {
+        stringBuilder = new StringBuilder();
         textField = controller.getTextField();
+        textField.setOnMouseEntered(event -> textField.setTooltip(createTooltip()));
         Button button = controller.getButton();
         this.selectedData = controller.getSelectedData();
-        button.setOnMouseClicked(event -> {
+        button.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             isShowing = !isShowing;
             showTree();
         });
-        root = new CheckBoxTreeItem<>(new RowData(null, "Типы файлов", null));
+        root = new CheckBoxTreeItem<>(new RowData(null, FILE_TYPES, null));
         root.setExpanded(true);
-        treeView = new TreeView<>(root);
+        TreeView<RowData> treeView = new TreeView<>(root);
         treeView.setCellFactory(CheckBoxTreeCell.forTreeView());
         treeView.cellFactoryProperty().setValue(param -> {
             MyCheckBoxTreeCell<RowData> cell = new MyCheckBoxTreeCell<>();
@@ -54,28 +65,83 @@ public class MyComboBox {
             });
             return cell;
         });
+        treeView.setPrefWidth(textField.getPrefWidth() + button.getPrefWidth());
+        treeView.setPrefHeight(controller.getTable_1().getPrefHeight());        
         popup = new Popup();
-        popup.setAutoHide(false);
+        popup.setAutoHide(true);
         popup.setHideOnEscape(false);
         popup.setAnchorLocation(PopupWindow.AnchorLocation.CONTENT_TOP_LEFT);
         popup.getContent().add(treeView);
+        popup.addEventHandler(WindowEvent.WINDOW_HIDING, event -> {
+            isShowing = !isShowing;
+            if (!isShowing){
+                textField.setText(getChoice());
+            }
+        });
     }
 
     private Tooltip createTooltip(){
-        if (!isShowing){
-            Tooltip tooltip = new Tooltip();
-//            tooltip.setText(getChoice());
-            return tooltip;
+        if (isShowing) return null;
+        Node node = createTree();
+        if (node == null) return null;
+        Tooltip tooltip = new Tooltip();
+        tooltip.setContentDisplay(ContentDisplay.CENTER);
+        tooltip.setGraphic(node);
+        return tooltip;
+    }
+
+    private Node createTree(){
+        if (root != null){
+            if (root.isSelected() || root.isIndeterminate()){
+                TreeView<String> treeView = new TreeView<>();
+                treeView.setRoot(new TreeItem<>(root.getValue().getType()));
+                treeView.setShowRoot(false);
+                TreeItem<String> rootView = treeView.getRoot();
+                int count = 0;
+                for (int i = 0; i <root.getChildren().size() ; i++) {
+                    CheckBoxTreeItem<RowData> item = (CheckBoxTreeItem<RowData>) root.getChildren().get(i);
+                    if (!item.isSelected() && !item.isIndeterminate()) continue;
+                    TreeItem<String> treeItem = new TreeItem<>(item.getValue().getType());
+                    for (int j = 0; j < item.getChildren().size(); j++) {
+                        CheckBoxTreeItem<RowData> itemLeaf = (CheckBoxTreeItem<RowData>) item.getChildren().get(j);
+                        if (itemLeaf.isSelected()){
+                            treeItem.getChildren().add(new TreeItem<>(itemLeaf.getValue().getExtension()));
+                            count++;
+                        }
+                    }
+                    treeItem.setExpanded(true);
+                    rootView.getChildren().add(treeItem);
+                    count++;
+                }
+                treeView.setEditable(false);
+                treeView.setPrefSize(textField.getPrefWidth(), HEIGHT_ITEM * count);
+                return treeView;
+            }
         }
         return null;
     }
 
-//    private String getChoice(){
-//        if (root.isSelected() || root.isIndeterminate()){
-//
-//        }
-//        return null;
-//    }
+    private String getChoice(){
+        if (root.isSelected() && !root.isIndeterminate()) return ALL;
+        if (root.isIndeterminate()){
+            stringBuilder.delete(0, stringBuilder.length());
+            for (int i = 0; i < root.getChildren().size(); i++) {
+                CheckBoxTreeItem<RowData> item = (CheckBoxTreeItem<RowData>) root.getChildren().get(i);
+                if (!item.isSelected() && !item.isIndeterminate()) continue;
+                stringBuilder.append(item.getValue().getType()).append(COLON);
+                for (int j = 0; j < item.getChildren().size(); j++) {
+                    CheckBoxTreeItem<RowData> itemLeaf = (CheckBoxTreeItem<RowData>) item.getChildren().get(j);
+                    if (itemLeaf.isSelected()){
+                        stringBuilder.append(itemLeaf.getValue().getExtension()).append(COMMA);
+                    }
+                }
+                stringBuilder.replace(stringBuilder.lastIndexOf(COMMA), stringBuilder.length(), THREE_DOTS);
+            }
+            stringBuilder.delete(stringBuilder.lastIndexOf(THREE_DOTS), stringBuilder.length());
+            return stringBuilder.toString();
+        }
+        return null;
+    }
 
     public void getSelected(){
         selectedData.clear();

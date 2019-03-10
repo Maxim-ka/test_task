@@ -6,6 +6,9 @@ import javafx.scene.control.cell.CheckBoxTreeCell;
 
 class MyCheckBoxTreeCell<T> extends CheckBoxTreeCell<T> {
 
+    private static final String SELECT = "select";
+    private static final String NOT_SELECTED = "notSelected";
+    private static final String VAGUE = "vague";
     private CheckBoxTreeItem<T> treeItem;
     private ChangeListener<Boolean> selected;
     private ChangeListener<Boolean> indeterminate;
@@ -18,21 +21,21 @@ class MyCheckBoxTreeCell<T> extends CheckBoxTreeCell<T> {
             select = newValue;
             if (select){
                 vague = false;
-                setId("select");
+                setId(SELECT);
                 return;
             }
-            if (!vague) setId("notSelected");
-            else setId("vague");
+            if (!vague) setId(NOT_SELECTED);
+            else setId(VAGUE);
         };
         indeterminate = (observable, oldValue, newValue) -> {
             vague = newValue;
             if (vague){
                 select = false;
-                setId("vague");
+                setId(VAGUE);
                 return;
             }
-            if (!select) setId("notSelected");
-            else setId("select");
+            if (!select) setId(NOT_SELECTED);
+            else setId(SELECT);
         };
     }
 
@@ -50,17 +53,21 @@ class MyCheckBoxTreeCell<T> extends CheckBoxTreeCell<T> {
         treeItem.indeterminateProperty().addListener(indeterminate);
     }
 
-    void set(CheckBoxTreeItem<T> treeItem) {
-        if (this.treeItem != null){
-            this.treeItem.selectedProperty().removeListener(selected);
-            this.treeItem.indeterminateProperty().removeListener(indeterminate);
+    private void remove(){
+        if (treeItem != null){
+            treeItem.selectedProperty().removeListener(selected);
+            treeItem.indeterminateProperty().removeListener(indeterminate);
         }
+    }
+
+    void set(CheckBoxTreeItem<T> treeItem) {
+        remove();
         this.treeItem = treeItem;
         select = treeItem.isSelected();
         vague = treeItem.isIndeterminate();
-        if (select && !vague) setId("select");
-        else if (vague)  setId("vague");
-        else setId("notSelected");
+        if (select && !vague) setId(SELECT);
+        else if (vague)  setId(VAGUE);
+        else setId(NOT_SELECTED);
         establish();
     }
 }
