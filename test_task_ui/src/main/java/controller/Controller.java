@@ -17,9 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.ss.util.CellUtil;
 import myComboBox.MyComboBox;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -83,13 +81,11 @@ public class Controller implements Initializable {
         tab_2_example.setCellValueFactory(new PropertyValueFactory <> ("example"));
 
         readFile();
-
     }
 
     private void readFile(){
         String extension = null, type = null, example = null;
-        try (FileInputStream fileInputStream = new FileInputStream(new File("table_1.xlsx"))){
-            XSSFWorkbook workbook = new XSSFWorkbook (fileInputStream);
+        try (XSSFWorkbook workbook = new XSSFWorkbook (getClass().getResourceAsStream("/table_1.xlsx"))){
             XSSFSheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
                 for (Cell cell : row) {
@@ -109,7 +105,7 @@ public class Controller implements Initializable {
                 }
                 dataObservableList.add(new RowData(extension, type, example));
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
