@@ -1,7 +1,7 @@
 ###### Тестовое задание.
 * Данные  загружаем из Excel.
 * Создать ComboBox with a TreeView and Check.
-  ![comboBox](E:\Maxim\Documents\JaVa\test_task\comboBox.png)
+  ![comboBox](https://github.com/Maxim-ka/test_task/tree/master/test_task_ui/comboBox.png)  
 * Структура значений с вложенностью для выбора данных.
 * В открытом виде:
   - Если внутри ветки выбраны все значения, check жирный и черный.
