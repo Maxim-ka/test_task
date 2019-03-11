@@ -1,9 +1,7 @@
 ###### Тестовое задание.
 * Данные  загружаем из Excel.
-* Создать ComboBox with a TreeView and Check.
-
+* Создать ComboBox with a TreeView and Check.  
   ![comboBox](https://github.com/Maxim-ka/test_task/raw/master/test_task_ui/comboBox.png)  
-  
 * Структура значений с вложенностью для выбора данных.
 * В открытом виде:
   - Если внутри ветки выбраны все значения, check жирный и черный.
