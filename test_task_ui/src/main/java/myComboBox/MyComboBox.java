@@ -14,6 +14,8 @@ import javafx.stage.PopupWindow;
 import javafx.stage.WindowEvent;
 import javafx.util.StringConverter;
 
+import java.util.stream.Stream;
+
 public class MyComboBox {
 
     private static final int HEIGHT_ITEM = 25;
@@ -150,14 +152,12 @@ public class MyComboBox {
             selectedData.addAll(observableList);
             return;
         }
-        for (int i = 0; i < root.getChildren().size() ; i++) {
-            CheckBoxTreeItem<RowData> item = (CheckBoxTreeItem<RowData>) root.getChildren().get(i);
-            if (!item.isSelected() && !item.isIndeterminate()) continue;
-            for (int j = 0; j < item.getChildren().size(); j++) {
-                CheckBoxTreeItem<RowData> itemLeaf = (CheckBoxTreeItem<RowData>) item.getChildren().get(j);
-                if (itemLeaf.isSelected()) selectedData.add(itemLeaf.getValue());
-            }
-        }
+        root.getChildren().stream()
+            .filter(item -> ((CheckBoxTreeItem<RowData>)item).isSelected() || ((CheckBoxTreeItem<RowData>)item).isIndeterminate())
+            .flatMap(item -> item.getChildren().stream())
+            .filter(itemLeaf -> ((CheckBoxTreeItem<RowData>)itemLeaf).isSelected())
+            .map(TreeItem::getValue)
+            .forEach(rowData -> selectedData.add(rowData));
     }
 
     private void showTree(){

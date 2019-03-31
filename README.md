@@ -76,3 +76,5 @@
 .zip	   | Архивы	                      | архив.zip
 .7z	 	   |                              | архив.7z
 .rar	   |	                          | архив.rar
+
+скачать, исполняемый файл TEST_TASK_MyComboBox.jar можно [здесь](https://cloud.mail.ru/public/2SSL/aaarF1zPn)
